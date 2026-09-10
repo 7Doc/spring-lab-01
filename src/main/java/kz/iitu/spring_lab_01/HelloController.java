@@ -14,7 +14,7 @@ public class HelloController {
     private String owner;
 
     @GetMapping("/hello")
-    public Greeting hello(@RequestParam(defaultValue = "world") String name) {
+    public Greeting hello(@RequestParam(defaultValue = "World") String name) {
         return new Greeting("Hello, " + name + "!", owner, LocalDateTime.now());
     }
 
