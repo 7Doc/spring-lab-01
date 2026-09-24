@@ -2,8 +2,10 @@ package kz.iitu.spring_lab_01.web;
 
 import kz.iitu.spring_lab_01.lifecycle.LifecycleDemo;
 import kz.iitu.spring_lab_01.notify.NotificationService;
+import kz.iitu.spring_lab_01.notify.Notifier;
 import kz.iitu.spring_lab_01.scope.Ticket;
 import kz.iitu.spring_lab_01.scope.TicketOffice;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -15,11 +17,13 @@ public class Lab2Controller {
     private final NotificationService notifications;
     private final LifecycleDemo lifecycle;   // add it to the controller constructor
     private final TicketOffice ticketOffice;
+    private final Notifier base64;
 
-    public Lab2Controller(NotificationService notifications, LifecycleDemo lifecycle, TicketOffice ticketOffice) {
+    public Lab2Controller(NotificationService notifications, LifecycleDemo lifecycle, TicketOffice ticketOffice, @Qualifier("base64") Notifier base64) {
         this.notifications = notifications;
         this.lifecycle = lifecycle;
         this.ticketOffice = ticketOffice;
+        this.base64 = base64;
     }
 
     @GetMapping("/notify")
@@ -40,4 +44,8 @@ public class Lab2Controller {
         return ticketOffice.demo();
     }
 
+    @GetMapping("/base64")
+    public String custom(@RequestParam(defaultValue = "Hello") String text) {
+        return base64.send(text);
+    }
 }
