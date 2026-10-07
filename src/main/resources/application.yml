@@ -2,10 +2,8 @@
 spring:
   application:
     name: spring-lab
-
 server:
   port: 8080
-
 app:
   owner: Assubayev Azamat         # put your own details here
   group: IT1CCO-2501ИС
@@ -15,10 +13,16 @@ app:
     timeout: 5s
     enabled: true
 
+  export:
+    formats:
+      - csv
+      - json
+      - xml
+    max-rows: 5000
+
 logging:
   level:
     kz.iitu: INFO
-
 management:
   endpoints:
     web:
