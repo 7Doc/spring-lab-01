@@ -1,5 +1,7 @@
 package kz.iitu.spring_lab_01.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,14 +12,18 @@ import kz.iitu.spring_lab_01.audit.Audited;
 @Service
 public class CatalogService {
 
+    @Autowired
+    @Lazy
+    private CatalogService self;
+
     public String findById(long id) {
-        sleep(50); // simulating a database call
+        sleep(50);
         return "Item no. " + id;
     }
 
     @Audited(action = "CATALOG_LIST", logArguments = true)
     public List<String> findAll(int limit) {
-        sleep(300); // a deliberately slow method
+        sleep(300);
         return IntStream.rangeClosed(1, limit)
                 .mapToObj(i -> "Item no. " + i)
                 .toList();
@@ -29,6 +35,7 @@ public class CatalogService {
             throw new IllegalArgumentException(
                     "Invalid identifier: " + id);
         }
+
         return "Removed item no. " + id;
     }
 
@@ -40,11 +47,10 @@ public class CatalogService {
         }
     }
 
-
     public String removeTwice(long id) {
-        String first  = remove(id);      // self-invocation: via this, past the proxy
-        String second = remove(id + 1);  // self-invocation as well
+        String first = self.remove(id);
+        String second = self.remove(id + 1);
+
         return first + "; " + second;
     }
-
 }
