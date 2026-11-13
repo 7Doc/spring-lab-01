@@ -2,6 +2,7 @@ package kz.iitu.spring_lab_01.service;
 
 import kz.iitu.spring_lab_01.catalog.Book;
 import kz.iitu.spring_lab_01.catalog.BookRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +24,8 @@ public class BookService {
 
         return repository.findAll().stream()
                 .filter(book -> book.author()
-                        .equalsIgnoreCase(author.trim()))
+                        .toLowerCase()
+                        .contains(author.trim().toLowerCase()))
                 .toList();
     }
 
@@ -31,10 +33,12 @@ public class BookService {
         return repository.findById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public Book create(Book book) {
         return repository.save(book);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean delete(long id) {
         return repository.deleteById(id);
     }

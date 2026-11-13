@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -33,17 +34,37 @@ public class BookPageController {
     }
 
     @PostMapping
-    public String create(@RequestParam String title,
-                         @RequestParam String author,
-                         @RequestParam int year,
-                         RedirectAttributes redirect) {
+    public String create(
+            @RequestParam String title,
+            @RequestParam String author,
+            @RequestParam int year,
+            RedirectAttributes redirect) {
 
-        Book saved = service.create(new Book(null, title, author, year));
+        Book saved = service.create(
+                new Book(null, title, author, year));
 
-        redirect.addFlashAttribute("message",
+        redirect.addFlashAttribute(
+                "message",
                 "Book «" + saved.title() + "» has been added");
 
-        return "redirect:/books";          // 302; the browser performs a GET
+        return "redirect:/books";
     }
 
+    @PostMapping("/{id}/delete")
+    public String delete(
+            @PathVariable long id,
+            RedirectAttributes redirect) {
+
+        boolean deleted = service.delete(id);
+
+        if (deleted) {
+            redirect.addFlashAttribute(
+                    "message", "Book has been deleted");
+        } else {
+            redirect.addFlashAttribute(
+                    "message", "Book not found");
+        }
+
+        return "redirect:/books";
+    }
 }

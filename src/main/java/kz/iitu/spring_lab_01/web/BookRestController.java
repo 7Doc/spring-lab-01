@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/books")
@@ -74,5 +76,37 @@ public class BookRestController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    // LANGUAGE HEADER ASSIGNMENT
+    @GetMapping(headers = "Accept-Language")
+    public List<Map<String, Object>> listLocalized(
+            @RequestHeader(value = "Accept-Language",
+                    defaultValue = "en") String language,
+            @RequestParam(required = false) String author,
+            @RequestParam(defaultValue = "10") int limit) {
+
+        boolean russian = language.toLowerCase().startsWith("ru");
+
+        return service.findAll(author).stream()
+                .limit(Math.max(0, limit))
+                .map(book -> {
+                    Map<String, Object> item = new LinkedHashMap<>();
+
+                    if (russian) {
+                        item.put("идентификатор", book.id());
+                        item.put("название", book.title());
+                        item.put("автор", book.author());
+                        item.put("год", book.year());
+                    } else {
+                        item.put("id", book.id());
+                        item.put("title", book.title());
+                        item.put("author", book.author());
+                        item.put("year", book.year());
+                    }
+
+                    return item;
+                })
+                .toList();
     }
 }

@@ -1,0 +1,39 @@
+package kz.iitu.spring_lab_01.service;
+
+
+import kz.iitu.spring_lab_01.AppUser;
+import kz.iitu.spring_lab_01.catalog.AppUserRepository;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+@Service
+public class DatabaseUserDetailsService implements UserDetailsService {
+
+    private final AppUserRepository users;
+
+    public DatabaseUserDetailsService(AppUserRepository users) {
+        this.users = users;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
+
+        AppUser u = users.findByUsername(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(username));
+
+        return User.withUsername(u.getUsername())
+                .password(u.getPasswordHash())
+                .authorities(
+                        u.getRoles().stream()
+                                .map(r -> "ROLE_" + r)
+                                .toArray(String[]::new)
+                )
+                .disabled(!u.isEnabled())
+                .build();
+    }
+}
