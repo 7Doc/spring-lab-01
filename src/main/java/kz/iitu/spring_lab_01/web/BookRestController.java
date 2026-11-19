@@ -1,5 +1,6 @@
 package kz.iitu.spring_lab_01.web;
 
+import jakarta.validation.Valid;
 import kz.iitu.spring_lab_01.catalog.Book;
 import kz.iitu.spring_lab_01.service.BookService;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,6 @@ public class BookRestController {
         this.service = service;
     }
 
-    // GET all
     @GetMapping
     public List<Book> list(
             @RequestParam(required = false) String author,
@@ -31,7 +31,6 @@ public class BookRestController {
                 .toList();
     }
 
-    // GET one
     @GetMapping("/{id}")
     public ResponseEntity<Book> find(@PathVariable long id) {
         return service.findById(id)
@@ -39,9 +38,8 @@ public class BookRestController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // POST
     @PostMapping
-    public ResponseEntity<Book> create(@RequestBody Book book) {
+    public ResponseEntity<Book> create(@Valid @RequestBody Book book) {
         Book saved = service.create(
                 new Book(null, book.title(), book.author(), book.year())
         );
@@ -51,11 +49,10 @@ public class BookRestController {
                 .body(saved);
     }
 
-    // PUT
     @PutMapping("/{id}")
     public ResponseEntity<Book> replace(
             @PathVariable long id,
-            @RequestBody Book book) {
+            @Valid @RequestBody Book book) {
 
         if (service.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -68,7 +65,6 @@ public class BookRestController {
         return ResponseEntity.ok(updated);
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) {
         if (service.delete(id)) {
@@ -78,7 +74,6 @@ public class BookRestController {
         return ResponseEntity.notFound().build();
     }
 
-    // LANGUAGE HEADER ASSIGNMENT
     @GetMapping(headers = "Accept-Language")
     public List<Map<String, Object>> listLocalized(
             @RequestHeader(value = "Accept-Language",
